@@ -1,31 +1,68 @@
-## FrameScript
+## Video Subtitle Generator
 
-API focada na geração de vídeos com legendas precisas, utilizando o modelo Whisper para transcrição de áudio em texto e o FFmpeg para processamento de arquivos. O sistema implementa filas para o processamento assincrono de multiplas tarefas simultâneas, controle de execução, atualização e cancelamento em tempo real.
+Geração automática de legendas em vídeos utilizando transcrição local com Whisper e processamento assíncrono baseado em filas.
+
+[Vídeo demonstração](https://www.linkedin.com/posts/devistto_fala-galera-desenvolvi-essa-api-com-nodejs-ugcPost-7450981626425077760-PZ5l/)
+
+### Introdução
+O objetivo deste projeto é automatizar todo o processo de legendagem de vídeos.
+
+O usuário envia um vídeo para a API, que realiza o processamento em segundo plano através de uma fila. O sistema extrai o áudio, gera a transcrição utilizando Whisper executado localmente, cria um arquivo .srt, incorpora as legendas ao vídeo original e disponibiliza o resultado final para download.
+
+Durante todo o processo, o cliente recebe atualizações de status em tempo real via WebSocket.
+
+### Funcionalidades
+- Upload de vídeos
+- Processamento assíncrono utilizando filas
+- Extração automática de áudio
+- Transcrição local com Whisper
+- Geração de arquivos .srt
+- Inserção ("burn-in") de legendas no vídeo
+- Atualização de status em tempo real
+- Limpeza automática de arquivos temporários
+- Execução isolada via Docker
 
 ### Tecnologias
-- NestJs
-- JavaScript & TypeScript
+#### Backend
+- NestJS
 - Node.js
+- TypeScript
 - Socket.IO
+
+#### Processamento Assíncrono
 - Redis
 - BullMQ
+
+#### Processamento de Mídia
+- FFmpeg
+- FFprobe
+- Whisper
+
+#### Infraestrutura-  
 - Docker
+- Docker Compose
+
+#### Ferramentas
 - Git
-- Ffmpeg & Ffprobe
-- HTML & CSS
+#### Frontend
+- HTML
+- CSS
+- JavaScript
 
 ### Instalação
-O Docker é necessário para seguir com a instalação. Caso ainda não o tenha instalado, vejo como proceder no [Linux](https://docs.docker.com/engine/install/) ou [Windows](https://docs.docker.com/desktop/setup/install/windows-install/)
-
-!: Clone o repositório localmente.
+Clonar o repositório
 ```bash
-git clone https://github.com/devistto/VideoCaptioner
+git clone https://github.com/devistto/video-subtitle-generator.git
 ```
-2: Inicie o servidor.
+Acessar o diretório
+```bash
+cd video-subtitle-generator
+```
+
+Subir os containers
 ```bash
 docker compose up --build
 ```
 
-#: Acesse o arquivo de entradas em [http://localhost:8000](http://localhost:8000)
-
-**Nota**: Durante o processamento, novos arquivos são gerados e poderão ser removidos em caso de falhas, reinicializações do servidor, cancelamento de tarefas ou após o salvamento local do resultado pelo usuário. 
+### Licença
+Este projeto foi desenvolvido para fins de estudo e portfólio.

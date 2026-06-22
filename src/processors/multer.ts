@@ -2,12 +2,10 @@ import { BadRequestException } from "@nestjs/common";
 import { diskStorage } from "multer"
 import path from "path";
 import fs from "node:fs"
-import { customAlphabet } from "nanoid"
+import { randomInt } from "crypto"
 import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
 
-const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz123456789", 10);
-
-const allowedMimeTypes = [
+const MIMETYPES = [
     "video/mp4", "video/mpeg", "video/quicktime", "video/mov", "video/wmv",
     "video/x-msvideo", "video/avi", "video/webm", "video/ogg", "video/x-flv",
     "video/3gpp", "video/3gpp2", "video/x-matroska", "video/x-ms-wmv", "video/ts",
@@ -20,27 +18,28 @@ const allowedMimeTypes = [
     "video/3gpp", "video/3gpp2",
 ];
 
-export const multerOptions: MulterOptions = {
+export const multer: MulterOptions = {
     storage: diskStorage({
         destination(req, file, callback) {
-            const base = path.join(process.cwd(), "tmp");
-            const filePath = path.join(base, nanoid());
+            const folder = path.join(
+                process.cwd(),
+                "uploads",
+                randomInt(5000).toString()
+            );
 
-            fs.mkdirSync(filePath, { recursive: true });
-
-            callback(null, filePath)
+            fs.mkdirSync(folder, { recursive: true });
+            callback(null, folder);
         },
         filename(req, file, callback) {
-            callback(null, file.originalname)
+            callback(null, "input" + path.extname(file.originalname))
         },
     }),
     fileFilter(req, file, callback) {
-        if (!allowedMimeTypes.includes(file.mimetype)) {
-            callback(
-                new BadRequestException(`Acceptable mimetypes values: ${allowedMimeTypes}`),
+        if (!MIMETYPES.includes(file.mimetype))
+            callback(new BadRequestException(
+                `Acceptable values are: ${MIMETYPES}`),
                 false
             )
-        };
 
         callback(null, true)
     }

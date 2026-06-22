@@ -1,14 +1,12 @@
 import { Module } from "@nestjs/common";
-import { VideoController } from "./controller/video.controller";
-import { VideoService } from "./service/video.service";
-import { TranscodeService } from "./service/transcode.service";
+import { MediaController } from "./media/media.controller";
+import { QueueService } from "./queue/queue.service";
+import { TranscodeService } from "./media/transcode.service";
 import { BullModule } from "@nestjs/bullmq";
-import { VideoJobConsumer } from "./jobs/video-job-consumer";
+import { WorkerService } from "./queue/worker.service";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
-import { WebsocketService } from "./service/websocket.service";
-import { FileLifecycleService } from "./service/file-lifecycle.service";
-import { AppService } from "./app.service";
+import { StatusService } from "./media/status.service";
 
 @Module({
     imports: [
@@ -25,10 +23,10 @@ import { AppService } from "./app.service";
             rootPath: join(__dirname, "..", "public")
         })
     ],
-    controllers: [VideoController],
+    controllers: [MediaController],
     providers: [
-        VideoService, TranscodeService, VideoJobConsumer,
-        WebsocketService, FileLifecycleService, AppService
+        QueueService, TranscodeService, WorkerService,
+        StatusService,
     ]
 })
 

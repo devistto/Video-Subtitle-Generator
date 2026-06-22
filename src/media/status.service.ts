@@ -8,7 +8,7 @@ type JobUpdateData = {
 }
 
 @WebSocketGateway()
-export class WebsocketService {
+export class StatusService {
     @WebSocketServer()
     private io!: Server
 

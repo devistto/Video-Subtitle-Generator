@@ -15,39 +15,27 @@ Durante todo o processo, o cliente recebe atualizações de status em tempo real
 - Upload de vídeos
 - Processamento assíncrono utilizando filas
 - Extração automática de áudio
-- Transcrição local com Whisper
+- Transcrição local (áudio > texto) com Whisper
 - Geração de arquivos .srt
 - Inserção ("burn-in") de legendas no vídeo
 - Atualização de status em tempo real
-- Limpeza automática de arquivos temporários
+- Limpeza de arquivos temporários
 - Execução isolada via Docker
 
 ### Tecnologias
-#### Backend
-- NestJS
-- Node.js
-- TypeScript
-- Socket.IO
+Backend
+- Node.js, TypeScript, NestJS, Socket.IO 
+- Redis, BullMQ, FFmpeg
 
-#### Processamento Assíncrono
-- Redis
-- BullMQ
+Frontend
+- HTML, CSS, JavaScript
 
-#### Processamento de Mídia
-- FFmpeg
-- FFprobe
-- Whisper
-
-#### Infraestrutura-  
-- Docker
-- Docker Compose
+Infraestrutura
+- Docker, Docker Compose
 
 #### Ferramentas
-- Git
-#### Frontend
-- HTML
-- CSS
-- JavaScript
+- Git, Whisper (ASR)
+
 
 ### Instalação
 Clonar o repositório
@@ -65,4 +53,6 @@ docker compose up --build
 ```
 
 ### Licença
-Este projeto foi desenvolvido para fins de estudo e portfólio.
+[MIT](./LICENSE)
+
+**Note**: Este projeto está sujeito a lisenças de dependências como [Whisper - speech-to-text](https://github.com/hwdsl2/docker-whisper#switching-models).

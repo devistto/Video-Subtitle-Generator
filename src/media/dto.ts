@@ -1,7 +1,8 @@
 import { Transform } from "class-transformer";
-import { IsBoolean, IsEnum, IsIn, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
 
-export enum WhisperLanguage {
+export enum Language {
+    Auto = "auto",
     afrikaans = "af", arabic = "ar", armenian = "hy", azerbaijani = "az",
     belarusian = "be", bosnian = "bs", bulgarian = "bg", catalan = "ca", chinese = "zh",
     croatian = "hr", czech = "cs", danish = "da", dutch = "nl", english = "en",
@@ -16,22 +17,22 @@ export enum WhisperLanguage {
     urdu = "ur", vietnamese = "vi", welsh = "cy"
 }
 
-export class TranscriptionDataDto {
-    @IsOptional()
-    @IsEnum(WhisperLanguage)
-    lang?: WhisperLanguage
-
-    @IsOptional()
-    @Transform(({ value }) => value === 'true')
-    @IsBoolean()
-    translate?: boolean
+export class MediaDto {
+    @IsEnum(Language)
+    language?: Language
 
     @IsOptional()
     @IsString()
-    initial_prompt?: string
+    prompt?: string
 
     @IsOptional()
-    @Transform(({ value }) => value === 'true')
+    @Transform(({ value }) => Number(value))
+    @IsNumber()
+    @Min(0)
+    @Max(1)
+    temperature?: number
+
     @IsBoolean()
-    vad_filter?: boolean
+    @Transform(({ value }) => value === 'true')
+    translate!: boolean
 }

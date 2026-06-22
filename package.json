@@ -1,14 +1,14 @@
 {
-  "name": "file-upload-transcriber",
-  "version": "0.0.1",
-  "description": "",
+  "name": "Video Subtitle Generator",
+  "version": "0.0.2",
+  "description": "Geração automática de legendas em vídeos utilizando transcrição local com Whisper e processamento assíncrono baseado em filas.",
   "author": "",
   "private": true,
   "license": "MIT",
   "type": "commonjs",
   "scripts": {
     "build": "nest build",
-    "start:dev": "nest start --watch",
+    "dev": "nest start --watch",
     "prestart:dev": "cp node_modules/socket.io-client/dist/socket.io.min.js public/"
   },
   "dependencies": {
@@ -30,7 +30,6 @@
     "fluent-ffmpeg": "^2.1.3",
     "ioredis": "^5.10.1",
     "multer": "^2.0.2",
-    "nanoid": "^5.1.6",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "socket.io": "^4.8.3"

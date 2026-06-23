@@ -9,7 +9,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class MediaController {
     constructor(private queue: QueueService) { }
 
-    @Post("subtitles")
+    @Post("upload")
     @UseInterceptors(FileInterceptor('video', multer))
     async generate(
         @UploadedFile(new ParseFilePipe({
@@ -18,14 +18,18 @@ export class MediaController {
         @Body() dto: MediaDto
     ) {
         const jobId = await this.queue.enqueue(file.path, dto);
-        return { id: jobId, status: "queued" };
+        return {
+            jobId: jobId,
+            status: "queued",
+            filename: file.filename
+        };
     }
 
-    @Get('jobs/:id')
+    @Get('download/:id')
     async findComplete(@Param('id') id: string) {
         const output = await this.queue.findResult(id);
         const stream = createReadStream(output);
-
+        console.log(id)
         return new StreamableFile(stream, {
             type: 'video/mp4',
             disposition: `attachment; filename="output.mp4"`,

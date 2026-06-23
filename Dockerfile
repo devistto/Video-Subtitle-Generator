@@ -10,6 +10,7 @@ RUN npm install @nestjs/cli
 
 COPY . .
 
+
 RUN apk add --no-cache ttf-dejavu
 
-CMD ["npm", "run", "dev"]
+CMD ["sh", "-c", "cp node_modules/socket.io-client/dist/socket.io.min.js public/ && npm run dev"]

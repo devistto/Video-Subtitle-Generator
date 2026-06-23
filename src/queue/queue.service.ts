@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { MediaDto } from "src/media/dto";
 import { Queue } from "bullmq";
 import { InjectQueue } from "@nestjs/bullmq";

@@ -12,8 +12,7 @@ export const whisper = async (
     const queryParams = new URLSearchParams({
         language: dto.language!,
         prompt: dto.prompt || "",
-        response_format: "srt",
-        temperature: String(dto.temperature || 0)
+        response_format: "srt"
     });
 
     const buffer = await readFile(audioPath);
@@ -24,7 +23,6 @@ export const whisper = async (
     formData.append("language", dto.language || "en");
     formData.append("prompt", dto.prompt || "");
     formData.append("response_format", "srt");
-    formData.append("temperature", String(dto.temperature || 0));
 
     formData.append(
         "file",

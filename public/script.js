@@ -1,172 +1,169 @@
-const fileInput = document.getElementById('video');
-const fileNameInput = document.querySelector('.file-row input[type="text"]');
-const selectLang = document.querySelector('select');
-const checkboxes = document.querySelectorAll('.checkbox-row input');
-const textarea = document.querySelector('textarea');
-const submitBtn = document.querySelector('.submit-btn');
-const jobsContainer = document.querySelector('.jobs');
+const baseUrl = "http://localhost:8000/videos"
 
-const baseUrl = "http://localhost:8000";
+const STATUS = {
+    0: "Na fila",
+    1: "Transcrevendo áudio",
+    2: "Incorporando legendas",
+    3: "Concluído"
+};
 
-fileInput.addEventListener('change', () => {
-    const file = fileInput.files[0];
-    fileNameInput.value = file ? file.name : 'No file selected.';
-});
+const socket = io();
+const jobsContainer = document.querySelector(".jobs");
+const jobs = new Map();
 
-submitBtn.addEventListener('click', async () => {
-    const file = fileInput.files[0];
+const form = document.querySelector(".form");
 
-    if (!file) {
-        alert('Selecione um arquivo');
+form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const fileInput = form.querySelector('[type="file"]');
+
+    if (!fileInput.files.length) {
         return;
     }
 
-    const language = selectLang.value;
-    const translate = checkboxes[0].checked ? true : false;
-    const vadFilter = checkboxes[1].checked ? true : false;
-    const prompt = textarea.value;
+    const file = fileInput.files[0];
 
     const formData = new FormData();
-    formData.append('video', file);
-    formData.append('lang', language);
-    formData.append('translate', translate);
-    formData.append('vad_filter', vadFilter);
-    formData.append('initial_prompt', prompt);
 
-    try {
+    formData.append("video", file);
 
-        const res = await fetch(`${baseUrl}/videos/subtitles`, {
-            method: 'POST',
-            body: formData
-        });
+    formData.append(
+        "language",
+        form.querySelector("select").value
+    );
 
-        const data = await res.json();
+    formData.append(
+        "translate",
+        form.querySelector('[type="checkbox"]').checked
+    );
 
-        createJob({
-            id: data.jobId,
-            name: file.name
-        });
+    formData.append(
+        "prompt",
+        form.querySelector("textarea").value
+    );
 
-    } catch (err) {
-        console.error(err);
-        alert('Faield. Couldn`t send form.');
-    }
-});
-
-function createJob({ id, name }) {
-    const job = document.createElement('div');
-    job.classList.add('job-card');
-    job.dataset.id = id;
-
-    job.innerHTML = `
-        <div class="progress-bar"></div>
-        <span>${name.length > 30 ? name.slice(0, 30) + "..." : name}</span>
-        <span class="progress">0%</span>
-        <button class="cancel-btn">cancel</button>
-    `;
-
-    job.querySelector('.cancel-btn').addEventListener('click', async (e) => {
-        if (e.target.dataset.disabled === "true") return;
-
-        await fetch(`${baseUrl}/videos/jobs/${id}`, {
-            method: 'DELETE'
-        });
-
-        job.remove();
+    const response = await fetch(`${baseUrl}/upload`, {
+        method: "POST",
+        body: formData
     });
 
-    jobsContainer.prepend(job);
+    const data = await response.json();
+
+    createJob({
+        jobId: data.jobId,
+        filename: file.name
+    });
+});
+
+const fileInput = document.querySelector('input[type="file"]');
+const selectedFile = document.querySelector('.selected-file');
+
+fileInput.addEventListener("change", () => {
+
+    const file = fileInput.files[0];
+
+    selectedFile.textContent = file
+        ? file.name
+        : "";
+});
+
+function createJob({ jobId, filename }) {
+
+    const element = document.createElement("div");
+
+    element.className = "job";
+
+    element.innerHTML = `
+        <div class="job-info">
+
+            <span class="filename">
+                ${filename}
+            </span>
+
+            <span class="status">
+                Na fila
+                <span class="dots"></span>
+            </span>
+
+        </div>
+
+        <button
+            class="save-btn"
+            disabled
+        >
+            Salvar
+        </button>
+    `;
+
+    jobsContainer.prepend(element);
+
+    jobs.set(jobId, {
+        filename,
+        element,
+        saveButton: element.querySelector(".save-btn"),
+        statusElement: element.querySelector(".status")
+    });
 }
 
-const jobs = {};
+async function downloadResult(jobId) {
+    const response = await fetch(`${baseUrl}/download/${jobId}`);
 
-function updateJobProgress(id, progress) {
-    const job = document.querySelector(`.job-card[data-id="${id}"]`);
-    const bar = job.querySelector('.progress-bar');
+    const blob = await response.blob();
 
-    if (!job) return;
+    const url = URL.createObjectURL(blob);
 
-    const progressEl = job.querySelector('.progress');
+    const a = document.createElement("a");
 
-    if (!jobs[id]) {
-        jobs[id] = {
-            current: 0,
-            interval: null
-        };
-    }
+    a.href = url;
+    a.download = `subtitle-${jobId}.mp4`;
 
-    const state = jobs[id];
+    document.body.appendChild(a);
 
-    if (state.current < progress) state.current = progress;
+    a.click();
 
-    let target;
+    a.remove();
 
-    const map = { 0: 9, 10: 49, 50: 99 };
+    URL.revokeObjectURL(url);
 
-    target = map[progress] ?? 100;
+    return true
+}
 
-    if (state.interval) clearInterval(state.interval);
+socket.on("connect", () => {
+    console.log("Connected:", socket.id);
+});
 
-    if (progress === 100) {
-        state.current = 100;
-        progressEl.textContent = `100%`;
-        bar.style.width = `${state.current}%`;
+socket.on("progress", async ({ jobId, progress }) => {
 
+    const job = jobs.get(jobId);
 
-        const btn = job.querySelector('.cancel-btn');
-
-        if (btn) {
-            btn.textContent = 'Save';
-            btn.classList.remove('cancel-btn');
-            btn.classList.add('save-btn');
-
-            btn.dataset.disabled = "false";
-            btn.style.opacity = "1";
-            btn.style.cursor = "pointer";
-            btn.style.pointerEvents = "auto";
-
-            const newBtn = btn.cloneNode(true);
-            btn.replaceWith(newBtn);
-
-            newBtn.addEventListener('click', () => {
-                window.open(`${baseUrl}/videos/jobs/${id}`);
-
-                job.remove();
-            });
-        }
-
+    if (!job) {
         return;
     }
 
-    state.interval = setInterval(() => {
-        if (state.current >= target) {
-            clearInterval(state.interval);
-            return;
+    const status = STATUS[progress];
+
+    job.statusElement.innerHTML = `
+        ${status}
+        ${progress !== 3
+            ? '<span class="dots"></span>'
+            : ""
         }
+    `;
 
-        state.current++;
-        console.log(state.current)
-        progressEl.textContent = `${state.current}%`;
-        bar.style.width = `${state.current}%`;
-    }, 300);
+    if (progress === 3) {
+        job.saveButton.disabled = false;
 
-    progressEl.textContent = `${state.current}%`;
+        job.saveButton.addEventListener(
+            "click",
+            async () => {
+                await downloadResult(jobId);
+                
+                job.element.remove();
+                jobs.delete(jobId);
 
-    if (progress >= 50) {
-        const btn = job.querySelector('.cancel-btn');
-
-        btn.style.opacity = "0.6";
-        btn.style.cursor = "none";
-        btn.style.pointerEvents = "none";
-        btn.dataset.disabled = "true";
+            },
+            { once: true }
+        );
     }
-}
-
-const socket = io(baseUrl);
-
-socket.on("connect", () =>
-    console.log("Connection stablished.")
-);
-socket.on('progress', (data) => {
-    updateJobProgress(data.id, data.progress)
-})
+});

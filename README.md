@@ -11,6 +11,8 @@ O usuário envia um vídeo para a API, que realiza o processamento em segundo pl
 
 Durante todo o processo, o cliente recebe atualizações de status em tempo real via WebSocket.
 
+![imagem demonstrativa](./assets/app-example.png)
+
 ### Funcionalidades
 - Upload de vídeos
 - Processamento assíncrono utilizando filas
@@ -19,8 +21,7 @@ Durante todo o processo, o cliente recebe atualizações de status em tempo real
 - Geração de arquivos .srt
 - Inserção ("burn-in") de legendas no vídeo
 - Atualização de status em tempo real
-- Limpeza de arquivos temporários
-- Execução isolada via Docker
+- Execução simplificada via Docker Compose
 
 ### Tecnologias
 Backend

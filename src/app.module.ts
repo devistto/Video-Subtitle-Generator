@@ -6,7 +6,7 @@ import { BullModule } from "@nestjs/bullmq";
 import { WorkerService } from "./queue/worker.service";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
-import { StatusService } from "./media/status.service";
+import { WebsocketService } from "./media/websocket";
 
 @Module({
     imports: [
@@ -26,7 +26,7 @@ import { StatusService } from "./media/status.service";
     controllers: [MediaController],
     providers: [
         QueueService, TranscodeService, WorkerService,
-        StatusService,
+        WebsocketService,
     ]
 })
 

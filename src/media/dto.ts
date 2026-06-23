@@ -2,7 +2,7 @@ import { Transform } from "class-transformer";
 import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
 
 export enum Language {
-    Auto = "auto",
+    quto = "auto",
     afrikaans = "af", arabic = "ar", armenian = "hy", azerbaijani = "az",
     belarusian = "be", bosnian = "bs", bulgarian = "bg", catalan = "ca", chinese = "zh",
     croatian = "hr", czech = "cs", danish = "da", dutch = "nl", english = "en",
@@ -24,13 +24,6 @@ export class MediaDto {
     @IsOptional()
     @IsString()
     prompt?: string
-
-    @IsOptional()
-    @Transform(({ value }) => Number(value))
-    @IsNumber()
-    @Min(0)
-    @Max(1)
-    temperature?: number
 
     @IsBoolean()
     @Transform(({ value }) => value === 'true')

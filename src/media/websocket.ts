@@ -3,12 +3,12 @@ import { JobProgress } from "bullmq";
 import { Server } from "socket.io";
 
 type JobUpdateData = {
-    id: string; 
+    jobId: string; 
     progress: JobProgress
 }
 
 @WebSocketGateway()
-export class StatusService {
+export class WebsocketService {
     @WebSocketServer()
     private io!: Server
 

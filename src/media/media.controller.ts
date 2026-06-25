@@ -19,20 +19,20 @@ export class MediaController {
     ) {
         const jobId = await this.queue.enqueue(file.path, dto);
         return {
-            jobId: jobId,
+            jobId,
             status: "queued",
             filename: file.filename
         };
     }
 
     @Get('download/:id')
-    async findComplete(@Param('id') id: string) {
-        const output = await this.queue.findResult(id);
-        const stream = createReadStream(output);
-        console.log(id)
-        return new StreamableFile(stream, {
-            type: 'video/mp4',
-            disposition: `attachment; filename="output.mp4"`,
+    async download(@Param('id') id: string) {
+        const output = await this.queue.output(id);
+
+        return new StreamableFile(
+            createReadStream(output), {
+            type: "video/mp4",
+            disposition: 'attachment; filename="output.mp4"',
         });
     }
 }

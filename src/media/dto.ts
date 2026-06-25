@@ -1,8 +1,9 @@
+import { Optional } from "@nestjs/common";
 import { Transform } from "class-transformer";
-import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
+import { IsBoolean, IsEnum, IsOptional, IsString } from "class-validator";
 
 export enum Language {
-    quto = "auto",
+    auto = "auto",
     afrikaans = "af", arabic = "ar", armenian = "hy", azerbaijani = "az",
     belarusian = "be", bosnian = "bs", bulgarian = "bg", catalan = "ca", chinese = "zh",
     croatian = "hr", czech = "cs", danish = "da", dutch = "nl", english = "en",
@@ -18,14 +19,18 @@ export enum Language {
 }
 
 export class MediaDto {
-    @IsEnum(Language)
-    language?: Language
+    @Transform(({ value }) =>
+        Object.values(Language).includes(value)
+            ? value
+            : Language.auto
+    )
+    language!: Language;
 
-    @IsOptional()
+    @Transform(({ value }) => value ?? "")
     @IsString()
-    prompt?: string
+    prompt!: string;
 
     @IsBoolean()
-    @Transform(({ value }) => value === 'true')
+    @Transform(({ value }) => value === true || value === "true")
     translate!: boolean
 }

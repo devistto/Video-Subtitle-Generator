@@ -21,7 +21,7 @@ export class QueueService {
         return job.id
     }
 
-    async findResult(id: string) {
+    async output(id: string) {
         const job = await this.videoQueue.getJob(id);
         return job?.returnvalue.outputPath
     }

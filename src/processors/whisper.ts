@@ -5,35 +5,24 @@ export const whisper = async (
     audioPath: string,
     dto: MediaDto
 ) => {
-    const baseUrl = "http://whisper:9000/v1/audio/transcriptions";
-
-    if (dto.translate) baseUrl.replace("transcriptions", "translate");
-
-    const queryParams = new URLSearchParams({
-        language: dto.language!,
-        prompt: dto.prompt || "",
-        response_format: "srt"
-    });
+    const endpoint = dto.translate ? "translations" : "transcriptions";
 
     const buffer = await readFile(audioPath);
-    
+
     const formData = new FormData();
 
-    formData.append("model", "whisper-1");
-    formData.append("language", dto.language || "en");
-    formData.append("prompt", dto.prompt || "");
+    formData.append("language", dto.language);
+    formData.append("prompt", dto.prompt);
     formData.append("response_format", "srt");
+    formData.append("file",
+        new Blob([buffer], { type: "audio/wav" }
+        ));
 
-    formData.append(
-        "file",
-        new Blob([buffer], { type: "audio/wav" }),
-        "audio.wav"
-    );
-
-    const res = await fetch(`${baseUrl}?${queryParams}`, {
+    const res = await fetch(
+        `http://whisper:9000/v1/audio/${endpoint}`, {
         method: "POST",
         body: formData
     });
 
-    return await res.text();
+    return res.text();
 }

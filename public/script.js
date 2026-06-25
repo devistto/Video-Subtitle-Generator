@@ -1,3 +1,8 @@
+const jobsContainer = document.querySelector(".jobs");
+const form = document.querySelector(".form");
+const fileInput = document.querySelector('input[type="file"]');
+const selectedFile = document.querySelector('.selected-file');
+
 const baseUrl = "http://localhost:8000/videos"
 
 const STATUS = {
@@ -8,10 +13,7 @@ const STATUS = {
 };
 
 const socket = io();
-const jobsContainer = document.querySelector(".jobs");
 const jobs = new Map();
-
-const form = document.querySelector(".form");
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -56,8 +58,7 @@ form.addEventListener("submit", async (event) => {
     });
 });
 
-const fileInput = document.querySelector('input[type="file"]');
-const selectedFile = document.querySelector('.selected-file');
+
 
 fileInput.addEventListener("change", () => {
 
@@ -158,7 +159,7 @@ socket.on("progress", async ({ jobId, progress }) => {
             "click",
             async () => {
                 await downloadResult(jobId);
-                
+
                 job.element.remove();
                 jobs.delete(jobId);
 

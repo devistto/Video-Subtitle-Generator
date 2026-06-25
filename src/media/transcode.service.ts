@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
+import { writeFileSync } from "fs";
 import path from "path";
-import fs from "node:fs"
 import ffmpeg from "src/processors/ffmpeg";
 
 @Injectable()
@@ -12,20 +12,24 @@ export class TranscodeService {
                     new BadRequestException("Unable to read file metadata")
                 );
 
-                const isVideo = metadata.streams?.find(stream => stream.codec_type === "video");
+                const isVideo = metadata.streams?.some(
+                    stream => stream.codec_type === "video"
+                );
 
                 if (!isVideo) return reject(
                     new BadRequestException("Unable to validate file properities")
                 )
 
-                return resolve()
+                resolve()
             });
         })
     }
 
     async extractAudio(videoPath: string): Promise<string> {
-        this.validateFile(videoPath)
-        const audioPath = path.join(path.dirname(videoPath), "audio.wav");
+        await this.validateFile(videoPath)
+
+        const dir = path.dirname(videoPath);
+        const audioPath = path.join(dir, "audio.wav");
 
         return new Promise((resolve, reject) => {
             ffmpeg(videoPath)
@@ -46,9 +50,9 @@ export class TranscodeService {
         subtitles: string
     ): Promise<string> {
         const dir = path.dirname(videoPath);
-        const srtPath = path.join(dir, 'subtitle.srt');
+        const srtPath = path.join(dir, 'subtitles.srt');
 
-        fs.writeFileSync(srtPath, subtitles, { encoding: "utf8" });
+        writeFileSync(srtPath, subtitles, { encoding: "utf8" });
 
         const outputPath = path.join(dir, "output.mp4");
         const normalizedSrtPath = srtPath.split(path.sep).join("/");
@@ -56,14 +60,13 @@ export class TranscodeService {
         return new Promise((resolve, reject) => {
             ffmpeg(videoPath)
                 .outputOptions([
-                    `-vf subtitles='${normalizedSrtPath}:force_style=FontName=Arial,FontSize=10,PrimaryColour=&H00FFFFFF,Outline=0.6,Outline=2,OutlineColour=&H70000000,Shadow=0,BackColour=&H80000000,Alignment=2,MarginV=30'`,
+                    `-vf subtitles='${normalizedSrtPath}:force_style=FontName=Arial,FontSize=10,PrimaryColour=&H00FFFFFF,Outline=0.6,OutlineColour=&H70000000,BackColour=&H80000000,Alignment=2,MarginV=20'`,
                     "-c:a copy"
                 ])
                 .videoCodec("libx264")
                 .format("mp4")
                 .on("end", () => resolve(outputPath))
                 .on("error", err => {
-                    console.log(err);
                     reject(new Error("File processing failed"))
                 })
                 .save(outputPath);

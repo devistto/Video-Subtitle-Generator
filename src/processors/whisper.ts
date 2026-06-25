@@ -17,7 +17,7 @@ export const whisper = async (
     formData.append("file",
         new Blob([buffer], { type: "audio/wav" }
         ));
-
+        
     const res = await fetch(
         `http://whisper:9000/v1/audio/${endpoint}`, {
         method: "POST",

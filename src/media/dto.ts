@@ -1,6 +1,5 @@
-import { Optional } from "@nestjs/common";
 import { Transform } from "class-transformer";
-import { IsBoolean, IsEnum, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsEnum, IsString } from "class-validator";
 
 export enum Language {
     auto = "auto",
@@ -19,6 +18,7 @@ export enum Language {
 }
 
 export class MediaDto {
+    @IsEnum(Language)
     @Transform(({ value }) =>
         Object.values(Language).includes(value)
             ? value

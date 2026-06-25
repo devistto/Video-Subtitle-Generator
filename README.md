@@ -2,7 +2,7 @@
 
 Geração automática de legendas em vídeos utilizando transcrição local com Whisper e processamento assíncrono baseado em filas.
 
-[Vídeo demonstração](https://www.linkedin.com/posts/devistto_fala-galera-desenvolvi-essa-api-com-nodejs-ugcPost-7450981626425077760-PZ5l/)
+[Vídeo demonstração](https://www.linkedin.com/posts/devistto_atualiza%C3%A7%C3%A3o-este-post-mostra-uma-vers%C3%A3o-activity-7476005008937902080-EQN5?utm_source=share&utm_medium=member_desktop&rcm=ACoAAGVn100BieRvyAMSkgzU9qUUbRemmWsneqw)
 
 ### Introdução
 O objetivo deste projeto é automatizar todo o processo de legendagem de vídeos.
